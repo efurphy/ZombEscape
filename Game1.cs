@@ -283,12 +283,14 @@ namespace ZombEscape
                             break;
                         }
                     }
+
                     break;
                 case "gameover":
                     if (Mouse.LeftButtonReleased)
                     {
                         screen = "title";
                     }
+
                     break;
             }
 

@@ -20,6 +20,7 @@ namespace ZombEscape
 
         public Action OnClick;
         public Action OnRelease;
+        public Action WhileNotHovered;
         public Action WhileHovered;
         public Action WhilePressed;
 
@@ -41,6 +42,22 @@ namespace ZombEscape
             pressed = false;
             textureColor = Color.White;
             SetText = text.SetText;
+
+            WhileNotHovered = () =>
+            {
+                textureColor = Color.White;
+            };
+
+            // for some reason, Color.DarkGray is lighter than Color.Gray
+            WhileHovered = () =>
+            {
+                textureColor = Color.DarkGray;
+            };
+
+            WhilePressed = () =>
+            {
+                textureColor = Color.Gray;
+            };
         }
 
         private bool CollisionPoint(float x, float y)
@@ -56,30 +73,31 @@ namespace ZombEscape
 
             if (hovered)
             {
-                WhileHovered();
+                WhileHovered?.Invoke();
 
                 if (Mouse.LeftButtonClicked)
                 {
                     OnClick?.Invoke();
                     pressed = true;
                 }
-                else if (Mouse.LeftButtonReleased)
+                else if (pressed && Mouse.LeftButtonReleased)
                 {
                     OnRelease?.Invoke();
                 }
             }
+            else
+            {
+                WhileNotHovered?.Invoke();
+            }
 
             if (!Mouse.LeftButtonDown) pressed = false;
 
-            if (pressed) { WhilePressed(); }
+            if (pressed) WhilePressed?.Invoke();
         }
 
         public void Draw(SpriteBatch batch)
         {
-            var color = Color.White;
-            if (hovered) { color = Color.DarkGray; } // for some reason, Color.DarkGray is lighter than Color.Gray
-            if (pressed) { color = Color.Gray; }
-            batch.Draw(texture, drawPosition, color);
+            batch.Draw(texture, drawPosition, textureColor);
             text.Draw(batch, textDrawPosition);
         }
 
